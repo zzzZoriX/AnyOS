@@ -12,8 +12,13 @@ void kernel_std_out(char* msg){
 
     GET_MSG_LENGTH(size, msg);
 
-    for(int vgai = 0, msgi = 0; msgi < size; vgai += 2, ++msgi){
-        VGA[vgai] =     msg[msgi];
-        VGA[vgai + 1] = 0x0f;
+    for(int msgi = 0; msgi < size; ++msgi){
+        VGA[vgai++] =     msg[msgi];
+        VGA[vgai++] = 0x0f;
     }
+}
+
+void kernel_newline(void){
+    unsigned line_size = SYMBOL_SIZE * SCREEN_COLUMNS;
+    vgai = vgai + (line_size - vgai % (line_size));
 }
