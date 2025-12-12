@@ -5,17 +5,17 @@ void kernel_clear_screen(void){
         VGA[i++] = ' ';
         VGA[i++] = 0x0f;
     }
+
+    vgai = 0;
 }
 
 void kernel_std_out(char* msg){
     int size = 0;
 
-    GET_MSG_LENGTH(size, msg);
+    GET_STR_LENGTH(size, msg);
 
-    for(int msgi = 0; msgi < size; ++msgi){
-        VGA[vgai++] =     msg[msgi];
-        VGA[vgai++] = 0x0f;
-    }
+    for(int msgi = 0; msgi < size; ++msgi)
+        kernel_std_put_char(msg[msgi]);
 }
 
 void kernel_newline(void){

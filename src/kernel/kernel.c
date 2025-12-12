@@ -1,8 +1,13 @@
+#include "command.h"
 #include "kernel_io.h"
 #include "keyboard.h"
+#include "stdstr.h"
 
 #define true    1
 #define false   0
+
+static char OS_STATUS = true; // true - turned on / false - turned off
+
 
 void kernel_main(void){
     kernel_clear_screen();
@@ -23,17 +28,22 @@ void kernel_main(void){
     unsigned command_pos = 0; 
 
 
-    while(true){
+    while(OS_STATUS){
         while(kernel_buffer_has_data()){
             const char c = kernel_buffer_get();
 
             if(c == '\n'){
-                kernel_newline();
-
                 command[command_pos] = '\0';
 
                 if(command_pos > 0){
-//                  добавить обработку команд
+                    if(compare(command, CMD_OFF_OS) == 0){
+                        OS_STATUS = false;
+                        break;
+                    }
+
+                    kernel_newline();
+
+                    process_command(command);
                 }
 
                 kernel_std_out(STD_PROMPT);
@@ -66,16 +76,3 @@ void kernel_main(void){
         asm volatile("hlt");        
     }
 }
-
-/**
-    TODO:
-        !ввод с клавы не работает, у меня просто идет как будто перезагрузка ОС. 
-        !доделать бесконечный цикл с обработкой ввода
-
-        !доделать backspace
-
-        доделать обработку команд
-
-    DEADLINE:
-        до 15:20
- */

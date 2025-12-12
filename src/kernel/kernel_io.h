@@ -1,7 +1,8 @@
 #ifndef KERNEL_IO
 #define KERNEL_IO
 
-#define GET_MSG_LENGTH(sptr, msg) for(char* ptr = (msg); *ptr != '\0'; ++ptr, ++(sptr));
+#define STR_COMPARE(str)
+
 #define SCREEN_SIZE     80 * 25 * 2
 #define SCREEN_COLUMNS  80
 #define SCREEN_ROWS     25
@@ -21,6 +22,8 @@ typedef struct {
 } buffer_t;
 
 static buffer_t buffer;
+
+#include "stdstr.h"
 
 
 void kernel_clear_screen(void);
