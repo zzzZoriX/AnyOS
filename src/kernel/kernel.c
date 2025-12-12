@@ -1,7 +1,6 @@
-#include "command.h"
 #include "kernel_io.h"
 #include "keyboard.h"
-#include "stdstr.h"
+#include "key_proc.h"
 
 #define true    1
 #define false   0
@@ -32,40 +31,8 @@ void kernel_main(void){
         while(kernel_buffer_has_data()){
             const char c = kernel_buffer_get();
 
-            if(c == '\n'){
-                command[command_pos] = '\0';
-
-                if(command_pos > 0){
-                    if(compare(command, CMD_OFF_OS) == 0){
-                        OS_STATUS = false;
-                        break;
-                    }
-
-                    kernel_newline();
-
-                    process_command(command);
-                }
-
-                kernel_std_out(STD_PROMPT);
-                
-                command_pos = 0;
-                in_command = true;
-            }
-            else if(c == '\b'){
-                if(command_pos > 0){
-                    --command_pos;
-
-                    kernel_backspace();
-                }
-            }
-            else if(c >= 2){
-                command[command_pos++] = c;
-
-                kernel_std_put_char(c);
-
-                if(!in_command)
-                    in_command = true;
-            }
+            if(!process_key(c, command, &command_pos, &OS_STATUS, &in_command))
+                break; // OS_STATUS = false
         }
 
         if(!in_command){
