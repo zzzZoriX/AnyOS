@@ -7,6 +7,8 @@
 #define SCREEN_COLUMNS  80
 #define SCREEN_ROWS     25
 #define SYMBOL_SIZE     2
+#define COLUMN_SIZE     SCREEN_ROWS * SYMBOL_SIZE
+#define ROW_SIZE        SCREEN_COLUMNS * SYMBOL_SIZE
 #define BUFFER_SIZE     256
 
 #define STD_PROMPT      "> "
@@ -38,5 +40,7 @@ void kernel_buffer_init(void);
 char kernel_buffer_has_data(void);
 char kernel_buffer_get(void);
 void kernel_buffer_put(const char c);
+
+void kernel_scroll_screen(void);
 
 #endif // KERNEL_IO

@@ -21,6 +21,9 @@ void kernel_std_out(char* msg){
 void kernel_newline(void){
     unsigned line_size = SYMBOL_SIZE * SCREEN_COLUMNS;
     vgai = vgai + (line_size - vgai % (line_size));
+
+    if(vgai >= SCREEN_SIZE)
+        kernel_scroll_screen();
 }
 
 void kernel_backspace(void){
@@ -33,6 +36,9 @@ void kernel_backspace(void){
 }
 
 void kernel_std_put_char(const char c){
+    if(vgai >= SCREEN_SIZE)
+        kernel_scroll_screen();
+
     VGA[vgai++] = c;
     VGA[vgai++] = 0x0f;
 }
@@ -65,4 +71,19 @@ void kernel_buffer_put(const char c){
     buffer.data[buffer.head] = c;
     buffer.head = (buffer.head + 1) % BUFFER_SIZE;
     ++buffer.count;
+}
+
+void kernel_scroll_screen(void){
+//  move up all lines
+    for(unsigned i = ROW_SIZE; i < SCREEN_SIZE; ++i)
+        VGA[i - SCREEN_COLUMNS * 2] = VGA[i];
+
+//  clear last line
+    unsigned lline_start = (SCREEN_ROWS - 1) * SCREEN_COLUMNS * SYMBOL_SIZE;
+    for(unsigned i = lline_start; i < SCREEN_SIZE; i += 2){
+        VGA[i] = ' ';
+        VGA[i + 1] = 0x0f;
+    }
+
+    vgai = lline_start;
 }
