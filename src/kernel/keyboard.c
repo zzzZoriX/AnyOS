@@ -1,4 +1,5 @@
 #include "keyboard.h"
+#include "kernel_io.h"
 
 const char kb_map[128] = {
 0, 27, 
@@ -77,6 +78,10 @@ void idt_init(void){
     load_idt(idt_ptr);
 }
 
+void keyboard_init(){
+    write_port(PIC1_DATA_PORT, 0xfd);
+}
+
 void kernel_keyboard_handler(void){
     unsigned char status;
     char keycode;
@@ -86,19 +91,23 @@ void kernel_keyboard_handler(void){
     status = read_port(KB_STATUS_PORT);
     if(status & 0x01){
         keycode = read_port(KB_DATA_PORT);
+
         if(keycode < 0)
             return;
 
-        if(keycode == ENTER_KEYCODE){
-            kernel_newline();
+        else if(keycode & 0x80)
             return;
+
+        else if(keycode == ENTER_KEYCODE)
+            kernel_buffer_put('\n');
+
+        else if(keycode == BACKSPACE_KEYCODE)
+            kernel_buffer_put('\b');
+
+        else {
+            const char c = kb_map[(unsigned char)keycode];
+            if(c != 0)
+                kernel_buffer_put(c);
         }
-
-        VGA[vgai++] = kb_map[(unsigned char)keycode];
-        VGA[vgai++] = 0x0f;
     }
-}
-
-void kernel_keyboard_init(void){
-    write_port(PIC1_DATA_PORT, 0xfd);
 }

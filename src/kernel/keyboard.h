@@ -13,16 +13,17 @@
 #define PIC2_DATA_PORT          0xa1
 
 #define ENTER_KEYCODE           0x1c
+#define BACKSPACE_KEYCODE       0x0e
 
 #include "kernel_io.h"
 
 typedef struct {
     unsigned short  lower_bits;
-    unsigned int    selector;
+    unsigned short  selector;
     unsigned char   zero;
     unsigned char   gate;
     unsigned short  hightest_bits;
-} IDT_elem;
+} __attribute__((packed)) IDT_elem;
 
 static IDT_elem IDT[IDT_SIZE];
 
@@ -35,7 +36,7 @@ extern void keyboard_handler(void);
 
 void idt_init(void);
 
-void kernel_keyboard_init(void);
+void keyboard_init(void);
 
 void kernel_keyboard_handler(void);
 
